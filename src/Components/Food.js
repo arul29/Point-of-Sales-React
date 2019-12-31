@@ -1,11 +1,24 @@
 import React, { Component } from "react";
-import { Row, Col, Button, Badge, Card, Pagination, InputNumber } from "antd";
+import {
+  Row,
+  Col,
+  Button,
+  Badge,
+  Card,
+  // Pagination,
+  InputNumber,
+  Skeleton
+} from "antd";
 // import Title from "antd/lib/skeleton/Title";
 import Meta from "antd/lib/card/Meta";
-import "./../Css/Pagination.css";
+// import "./../Css/Pagination.css";
 import ButtonGroup from "antd/lib/button/button-group";
 import { Typography } from "antd";
 import Checkout from "./Checkout";
+import { getMenu } from "../Public/Redux/Actions/menu";
+import { connect } from "react-redux";
+import Axios from "axios";
+import Pagination from "./Pagination";
 
 const { Title } = Typography;
 class Food extends Component {
@@ -13,12 +26,20 @@ class Food extends Component {
     super(props);
     this.state = {
       cartItem: [],
+      // menuItem: [],
+      // loading: true,
+      currentPage: 1,
+      postsPerPage: 6
       // disabledClick: [],
-      valueCountItem: 0,
-      valueCountPrice: [],
-      cartItemCount: []
+      // valueCountItem: 0,
+      // valueCountPrice: [],
+      // cartItemCount: []
     };
   }
+
+  // componentDidMount() {
+  //   this.getMenuData();
+  // }
 
   sendBackData = count => {
     this.props.parentCallback(count + 1);
@@ -58,10 +79,16 @@ class Food extends Component {
   }
 
   // cartItemCount() {}
-
   cartItemCount(index, count) {
     let items = this.state.cartItem;
     items[index].count = count;
+    this.setState({ cartItem: items });
+  }
+
+  buttonCartItemCount(index, method) {
+    let items = this.state.cartItem;
+    if (method === "+") items[index].count += 1;
+    else items[index].count -= 1;
     this.setState({ cartItem: items });
   }
 
@@ -69,54 +96,17 @@ class Food extends Component {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   }
   render() {
-    // console.log(this.state.cartItem);
+    //PAGINATION
+    const indexOflastpost = this.state.currentPage * this.state.postsPerPage;
+    const indexOffirstPost = indexOflastpost - this.state.postsPerPage;
+    const currentPost = this.props.menuItem.slice(
+      indexOffirstPost,
+      indexOflastpost
+    );
+    // console.log("menu dari db", this.state.menuItem);
     let arr = this.state.cartItem;
     let total = arr.reduce((prev, next) => prev + next.count * next.price, 0);
     // console.log("ini cart", this.state.cartItem);
-    let food = [
-      {
-        id: 0,
-        name: "Ayam Bakar",
-        price: 20000,
-        img:
-          "https://selerasa.com/wp-content/uploads/2015/12/images_daging_ayam-bakar-pedas-manis.jpg"
-      },
-      {
-        id: 1,
-        name: "Ikan Bakar",
-        price: 22000,
-        img:
-          "https://upload.wikimedia.org/wikipedia/commons/f/ff/Gurame_bakar_kecap_1.JPG"
-      },
-      {
-        id: 2,
-        name: "Nasi Goreng",
-        price: 12000,
-        img:
-          "https://www.masakapahariini.com/wp-content/uploads/2018/04/cara-membuat-nasi-goreng-seafood-620x440.jpg"
-      },
-      {
-        id: 3,
-        name: "Coto Makassar",
-        price: 15000,
-        img:
-          "https://selerasa.com/wp-content/uploads/2016/11/images_Kue_cubit_Resep-coto-makassar.jpg"
-      },
-      {
-        id: 4,
-        name: "Ayam Geprek",
-        price: 13000,
-        img:
-          "https://www.masakapahariini.com/wp-content/uploads/2018/04/resep_ayam_bakar_kecap_manis_MAHI-780x440.jpg"
-      },
-      {
-        id: 5,
-        name: "Sate Ayam",
-        price: 14000,
-        img:
-          "https://cdn02.indozone.id/re/content/2019/07/01/3esnJq/t_5d19c617f2ce1.jpg?w=700&q=85"
-      }
-    ];
 
     //KODE RECEIPT
     let date = new Date();
@@ -136,7 +126,8 @@ class Food extends Component {
           <Col
             span={18}
             style={{
-              backgroundColor: "#e1e6e8"
+              backgroundColor: "#e1e6e8",
+              minHeight: "120vh"
             }}
           >
             {/* <center> */}
@@ -148,7 +139,25 @@ class Food extends Component {
               }}
               gutter={16}
             >
-              {food.map((item, index) => {
+              {this.props.loading ? (
+                <div style={{ paddingRight: "8%" }}>
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                </div>
+              ) : null}
+              {this.props.menuItem.length > 0 ? null : (
+                <center>
+                  <img
+                    style={{ paddingTop: "5%" }}
+                    width="50%"
+                    src="https://hoangnguyengreen.com/public/static/theme/img/cart_empty_icon.png"
+                  />
+                  <Title level={2}>No Result Found</Title>
+                </center>
+              )}
+              {currentPost.map((item, index) => {
                 return (
                   <Col span={8}>
                     <Card
@@ -205,14 +214,23 @@ class Food extends Component {
             </Row>
             {/* </center> */}
             <center>
-              <div className="pagination">
-                <a href="#">&laquo;</a>
-                <a href="#">1</a>
-                <a href="#" class="active">
-                  2
-                </a>
-                <a href="#">3</a>
-                <a href="#">&raquo;</a>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "10px",
+                  margin: "auto",
+                  left: 0,
+                  right: 0
+                }}
+              >
+                <Pagination
+                  currentPage={this.state.currentPage}
+                  totalPosts={this.props.menuItem.length}
+                  postsPerPage={this.state.postsPerPage}
+                  paginate={pagenumbers =>
+                    this.setState({ currentPage: pagenumbers })
+                  }
+                />
               </div>
             </center>
           </Col>
@@ -246,40 +264,30 @@ class Food extends Component {
                         <Col span={3} />
                         <Col span={12}>
                           <ButtonGroup>
-                            <Button>-</Button>
-                            {/* <Button disabled>0</Button> */}
+                            <Button
+                              onClick={() =>
+                                this.buttonCartItemCount(index, "-")
+                              }
+                            >
+                              -
+                            </Button>
                             <input
                               onChange={event =>
-                                // this.setState({
-                                // valueCountItem: event.target.value
-                                // valueCountPrice: joinedCount
-                                // }),
                                 this.cartItemCount(index, event.target.value)
                               }
-                              // onInput={event => {
-                              //   console.log("index", index);
-
-                              //   // (event) {
-                              //   // this.setState({value: event.target.value});
-                              //   let joinedCount = this.state.valueCountPrice.concat(
-                              //     event.target.value * countPrice
-                              //   );
-                              //   this.setState({
-                              //     valueCountItem: event.target.value,
-                              //     valueCountPrice: joinedCount
-                              //   });
-                              //   countPrice2[index] =
-                              //     countPrice * event.target.value;
-                              //   console.log("counzzz", countPrice2[index]);
-                              // }}
                               name="price"
-                              // value={this.state.valueCountItem[index]}
                               value={item.count}
                               min={0}
                               type="number"
                               style={{ width: 45, height: 30 }}
                             />
-                            <Button>+</Button>
+                            <Button
+                              onClick={() =>
+                                this.buttonCartItemCount(index, "+")
+                              }
+                            >
+                              +
+                            </Button>
                           </ButtonGroup>
                           <Title level={3}>
                             {item.price * item.count === 0
@@ -354,3 +362,11 @@ class Food extends Component {
 }
 
 export default Food;
+
+// const mapStateToProps = state => {
+//   return {
+//     menu: state.menu // namaProps: state.namaReducer
+//   };
+// };
+
+// export default connect(mapStateToProps)(Food);
