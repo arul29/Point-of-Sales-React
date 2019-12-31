@@ -6,15 +6,19 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
 import "./index.css";
+// import { Provider } from "react-redux";
+// import store from "./Public/Redux/store";
 
 const EnhancedApp = () => {
   return (
+    // redux
+    // <Provider store={store}>
     <Router>
       <div>
         <Route path="/" exact component={App} />
-        {/* <Route path="/admin/" exact component={Admin} /> */}
       </div>
     </Router>
+    // </Provider>
   );
 };
 ReactDOM.render(<EnhancedApp />, document.getElementById("root"));
