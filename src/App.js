@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import Food from "./Components/Food";
 import History from "./Components/History";
 import Error404 from "./Components/Error404";
+import AddMenu from "./Components/AddMenu";
+import Axios from "axios";
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 const { Title } = Typography;
@@ -16,11 +18,42 @@ class App extends React.Component {
     super(props);
     this.state = {
       collapsed: true,
-      cartCount: 0
+      cartCount: 0,
+      menuItem: [],
+      loading: true
     };
   }
 
-  // state = { message: "parent message" }
+  componentDidMount() {
+    this.getMenuData();
+  }
+  // async
+  getMenuData() {
+    // di komen reduxnya dulu ya
+    // await this.props.dispatch(getMenu());
+    // this.setState({
+    // menuItem: this.props.menu.menuData,
+    // loading: false
+    // });
+    setTimeout(() => {
+      Axios.get("http://localhost:6660/api/menu")
+        .then(res => {
+          this.setState({
+            menuItem: res.data.response,
+            loading: false
+          });
+          // console.log(this.state.menuItem);
+        })
+        .catch(error => {
+          console.log(error);
+          this.setState({
+            menuItem: [],
+            loading: false
+          });
+        });
+    }, 500);
+  }
+
   callbackFunction = childData => {
     this.setState({ cartCount: childData });
   };
@@ -46,7 +79,13 @@ class App extends React.Component {
           <Menu
             theme="dark"
             // defaultSelectedKeys={["1"]}
-            selectedKeys={[pages === null || pages === "food" ? "1" : "2"]}
+            selectedKeys={[
+              pages === null || pages === "food"
+                ? "1"
+                : pages === "history"
+                ? "2"
+                : ""
+            ]}
             mode="inline"
           >
             <Item style={{ marginLeft: "35%" }}>
@@ -72,7 +111,7 @@ class App extends React.Component {
             </Menu.Item>
             <Menu.Item
               onClick={() => {
-                alert("Tambahkan Item Anda");
+                this.child.showModal();
               }}
             >
               {/* <Link to={"?page=history"}> */}
@@ -80,6 +119,12 @@ class App extends React.Component {
               <Icon style={{ fontSize: 25 }} type="plus-circle" />
               <span>Add Item</span>
               {/* </Link> */}
+              <AddMenu
+                // getMenuData={this.getMenuData}
+                ref={instance => {
+                  this.child = instance;
+                }}
+              />
             </Menu.Item>
           </Menu>
         </Sider>
@@ -95,7 +140,11 @@ class App extends React.Component {
                   }}
                   level={4}
                 >
-                  {pages === null || pages === "food" ? "Food Item" : "History"}
+                  {pages === null || pages === "food"
+                    ? "Food Item"
+                    : pages === "history"
+                    ? "History"
+                    : "Not Found"}
                 </Title>
               </Col>
               {pages === null || pages === "food" ? (
@@ -120,13 +169,9 @@ class App extends React.Component {
               )}
             </Row>
           </Header>
-          {/* <Content style={{ margin: "0 16px" }}> */}
-          {/* <Breadcrumb style={{ margin: "16px 0" }}> */}
-          {/* <Breadcrumb.Item> */}
-          {/* {pages === null || pages === "food" ? "Food Item" : "History"} */}
-          {/* </Breadcrumb.Item> */}
-          {/* <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
-          {/* </Breadcrumb> */}
+          {/* <Content style={{ margin: "0 16px" }}> <Breadcrumb style={{ margin: "16px 0" }}> <Breadcrumb.Item> */}
+          {/* {pages === null || pages === "food" ? "Food Item" : "History"} </Breadcrumb.Item> */}
+          {/* <Breadcrumb.Item>Bill</Breadcrumb.Item> </Breadcrumb> */}
           <div
             style={{
               //padding: 24,
@@ -135,7 +180,11 @@ class App extends React.Component {
             }}
           >
             {pages === null || pages === "food" ? (
-              <Food parentCallback={this.callbackFunction} />
+              <Food
+                loading={this.state.loading}
+                parentCallback={this.callbackFunction}
+                menuItem={this.state.menuItem}
+              />
             ) : pages === "history" ? (
               <History parentCallback={this.callbackFunction} />
             ) : (
