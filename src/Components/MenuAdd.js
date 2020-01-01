@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 
 const { Option } = Select;
 const { Title } = Typography;
-class AddMenu extends React.Component {
+class MenuAdd extends React.Component {
   constructor(props) {
     super(props);
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -23,28 +23,21 @@ class AddMenu extends React.Component {
       price: "",
       category: "",
       img: "",
-      handlingInput: null
+      handlingInput: ""
     };
   }
 
-  showModal = () => {
+  showModalAdd = () => {
     this.setState({
       visible: true
     });
   };
 
-  // handleOk = () => {
-  //   this.setState({ loading: true });
-  //   setTimeout(() => {
-  //     this.setState({ loading: false, visible: false });
-  //   }, 3000);
-  // };
-
   handleCancel = () => {
     this.setState({
       visible: false,
       previewVisible: false,
-      handlingInput: null,
+      handlingInput: "",
       // Reset form data
       fileList: [],
       name: "",
@@ -91,17 +84,13 @@ class AddMenu extends React.Component {
   handleInputMenu() {
     if (this.state.name === "") {
       this.setState({ handlingInput: "* Name Cannot Empty" });
-    } else if (this.state.price === "") {
+    } else if (this.state.price === "" || this.state.price < 1) {
       this.setState({ handlingInput: "* Price Cannot Empty" });
     } else if (this.state.category === "") {
       this.setState({ handlingInput: "* Category Cannot Empty" });
     } else if (this.state.fileList.length === 0 && this.state.img === "") {
       this.setState({ handlingInput: "* Image Cannot Empty" });
     } else {
-      this.setState({ loading: true });
-      setTimeout(() => {
-        this.setState({ loading: false, visible: false });
-      }, 3000);
       const menuNew = new FormData();
       menuNew.append("name", this.state.name);
       menuNew.append("price", this.state.price);
@@ -111,18 +100,22 @@ class AddMenu extends React.Component {
       else menuNew.append("img", this.state.img);
       console.log("menu new", menuNew);
 
-      Axios.post("http://localhost:6660/api/menu", menuNew)
-        .then(() => {
-          Swal.fire("Added Success", "Menu has ben added", "success").then(
-            () => {
-              // this.props.getMenuData();
-              document.location.href = "/";
-            }
-          );
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      this.setState({ loading: true });
+      setTimeout(() => {
+        this.setState({ loading: false, visible: false });
+        Axios.post("http://localhost:6660/api/menu", menuNew)
+          .then(() => {
+            Swal.fire("Added Success", "Menu has been added", "success").then(
+              () => {
+                // this.props.getMenuData();
+                document.location.href = "/";
+              }
+            );
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }, 3000);
     }
   }
 
@@ -246,4 +239,4 @@ class AddMenu extends React.Component {
   }
 }
 
-export default AddMenu;
+export default MenuAdd;
