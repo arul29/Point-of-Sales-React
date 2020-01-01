@@ -19,6 +19,8 @@ import { getMenu } from "../Public/Redux/Actions/menu";
 import { connect } from "react-redux";
 import Axios from "axios";
 import Pagination from "./Pagination";
+import MenuEdit from "./MenuEdit";
+import MenuEditImg from "./MenuEditImg";
 
 const { Title } = Typography;
 class Food extends Component {
@@ -78,7 +80,6 @@ class Food extends Component {
     this.sendBackData(cartCount);
   }
 
-  // cartItemCount() {}
   cartItemCount(index, count) {
     let items = this.state.cartItem;
     items[index].count = count;
@@ -94,6 +95,25 @@ class Food extends Component {
 
   formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  }
+
+  showModalEdit(item) {
+    this.setState({
+      edit_id: item.id,
+      edit_name: item.name,
+      edit_price: item.price,
+      edit_category: item.category
+    });
+    this.refs.childEdit.showModalEdit(
+      item.id,
+      item.name,
+      item.price,
+      item.category
+    );
+  }
+
+  showModalEditImg(id, img) {
+    this.refs.childEditImg.showModalEditImg(id, img);
   }
   render() {
     //PAGINATION
@@ -122,12 +142,14 @@ class Food extends Component {
     let codeReceiptString = components.join("");
     return (
       <div>
+        <MenuEdit ref="childEdit" />
+        <MenuEditImg ref="childEditImg" />
         <Row>
           <Col
             span={18}
             style={{
               backgroundColor: "#e1e6e8",
-              minHeight: "120vh"
+              minHeight: localStorage.token ? "135vh" : "120vh"
             }}
           >
             {/* <center> */}
@@ -157,20 +179,22 @@ class Food extends Component {
                   <Title level={2}>No Result Found</Title>
                 </center>
               )}
+
               {currentPost.map((item, index) => {
                 return (
                   <Col span={8}>
                     <Card
-                      onClick={() =>
-                        this.state.cartItem.filter(cart => item.id === cart.id)
-                          .length > 0
-                          ? null
-                          : this.cartAdd(item)
-                      }
                       hoverable
                       style={{ width: "76%", borderRadius: 10 }}
                       cover={
                         <img
+                          onClick={() =>
+                            this.state.cartItem.filter(
+                              cart => item.id === cart.id
+                            ).length > 0
+                              ? null
+                              : this.cartAdd(item)
+                          }
                           alt="example"
                           src={item.img}
                           height="200"
@@ -192,6 +216,46 @@ class Food extends Component {
                         title={item.name}
                         description={"Rp. " + this.formatNumber(item.price)}
                       />
+                      {localStorage.token ? (
+                        <div>
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "37%",
+                              width: "100%",
+                              left: 0
+                            }}
+                          >
+                            <Button
+                              type="default"
+                              style={{
+                                width: "100%"
+                              }}
+                              onClick={() => {
+                                this.showModalEditImg(item.id, item.img);
+                              }}
+                            >
+                              Change Image
+                            </Button>
+                          </div>
+                          <div style={{ paddingTop: "10%" }}>
+                            <Button
+                              type="primary"
+                              style={{ width: "100%" }}
+                              onClick={() => {
+                                this.showModalEdit(item);
+                              }}
+                            >
+                              Edit
+                            </Button>
+
+                            {/* &nbsp; */}
+                            {/* <Button>Delete</Button> */}
+                          </div>
+                        </div>
+                      ) : (
+                        ""
+                      )}
 
                       {this.state.cartItem.filter(cart => item.id === cart.id)
                         .length > 0 && (
@@ -234,14 +298,17 @@ class Food extends Component {
               </div>
             </center>
           </Col>
-          <Col span={6} style={{ overflow: "auto", maxHeight: "120vh" }}>
+          <Col
+            span={6}
+            style={{
+              overflow: "auto",
+              maxHeight: localStorage.token ? "135vh" : "120vh"
+            }}
+          >
             {/* <div> */}
             {this.state.cartItem.length > 0 ? (
               this.state.cartItem
                 .map((item, index) => {
-                  // let countPrice = [item.price];
-                  // let countPrice2 = [item.price];
-
                   return (
                     <Card
                       key={index}
@@ -293,10 +360,7 @@ class Food extends Component {
                             {item.price * item.count === 0
                               ? this.removeCartItem(item.id)
                               : "Rp. " +
-                                this.formatNumber(item.price * item.count)
-                            // this.state.valueCountPrice[index] *
-                            // this.state.valueCountItem
-                            }
+                                this.formatNumber(item.price * item.count)}
                           </Title>
                         </Col>
                       </Row>
@@ -319,14 +383,10 @@ class Food extends Component {
                     <Title level={3}>Total:</Title>
                   </Col>
                   <Col span={12}>
-                    {/* {
-                    this.state.cartItem.map((item,index)=>{
-                     
-                    })} */}
                     <Title level={3}>{"Rp. " + this.formatNumber(total)}</Title>
                   </Col>
                 </Row>
-                <Title level={4}>*Belum termasuk PPN</Title>
+                <Title level={4}>* Not including PPN</Title>
                 <Button
                   type="primary"
                   block
@@ -336,8 +396,8 @@ class Food extends Component {
                 >
                   Checkout
                 </Button>
-                {/* onClick={this.showModal} */}
                 <Checkout
+                  date={date}
                   total={total}
                   codeR={codeReceiptString}
                   dataCheckout={this.state.cartItem}
