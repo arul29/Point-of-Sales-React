@@ -1,26 +1,47 @@
 import React from "react";
 // import logo from "./logo.svg";
 import "./App.css";
-import { Layout, Menu, Breadcrumb, Icon, Row, Col, Button, Badge } from "antd";
+import {
+  Layout,
+  Menu,
+  Breadcrumb,
+  Icon,
+  Row,
+  Col,
+  Button,
+  Badge,
+  Input,
+  Select
+} from "antd";
 import Item from "antd/lib/list/Item";
 import { Typography } from "antd";
 import { Link } from "react-router-dom";
 import Food from "./Components/Food";
 import History from "./Components/History";
 import Error404 from "./Components/Error404";
-import AddMenu from "./Components/AddMenu";
+import MenuAdd from "./Components/MenuAdd";
 import Axios from "axios";
+import Login from "./Components/Login";
+import Logout from "./Components/Logout";
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 const { Title } = Typography;
+const { Option } = Select;
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.sortBy = this.sortBy.bind(this);
+    this.sortAscending = this.sortAscending.bind(this);
+    this.sortDescending = this.sortDescending.bind(this);
+    this.searchMenu = this.searchMenu.bind(this);
+    this.filterMenubyCategory = this.filterMenubyCategory.bind(this);
     this.state = {
       collapsed: true,
       cartCount: 0,
       menuItem: [],
-      loading: true
+      menuItemShow: [],
+      loading: true,
+      sortby: "name"
     };
   }
 
@@ -40,6 +61,7 @@ class App extends React.Component {
         .then(res => {
           this.setState({
             menuItem: res.data.response,
+            menuItemShow: res.data.response,
             loading: false
           });
           // console.log(this.state.menuItem);
@@ -61,6 +83,80 @@ class App extends React.Component {
   onCollapse = collapsed => {
     console.log(collapsed);
     this.setState({ collapsed });
+  };
+
+  showModalLogin() {
+    this.refs.childLogin.showModalLogin();
+  }
+  showModalLogout() {
+    this.refs.childLogout.showModalLogout();
+  }
+  showModalAdd() {
+    this.refs.childAdd.showModalAdd();
+  }
+
+  // var FilteredList = React.createClass({
+  searchMenu(event) {
+    let updatedList = this.state.menuItem;
+    updatedList = updatedList.filter(function(item) {
+      return (
+        item.name.toLowerCase().search(event.target.value.toLowerCase()) !== -1
+      );
+    });
+    this.setState({ menuItemShow: updatedList });
+  }
+  filterMenubyCategory(value) {
+    if (value === "all") {
+      this.setState({ menuItemShow: this.state.menuItem });
+    } else {
+      let updatedList = this.state.menuItem;
+      updatedList = updatedList.filter(function(item) {
+        return item.category.toLowerCase().search(value.toLowerCase()) !== -1;
+      });
+      this.setState({ menuItemShow: updatedList });
+    }
+  }
+
+  sortBy(value) {
+    this.setState({
+      sortby: value
+    });
+  }
+
+  sortAscending() {
+    let sort = this.state.sortby;
+    const myData = this.state.menuItem.sort(function(a, b) {
+      if (sort === "name") {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      } else {
+        if (a.price < b.price) return -1;
+        if (a.price > b.price) return 1;
+      }
+      return 0;
+    });
+    // console.log(myData);
+    this.setState({
+      menuItemShow: myData
+    });
+  }
+
+  sortDescending = () => {
+    let sort = this.state.sortby;
+    const myData = this.state.menuItem.sort(function(b, a) {
+      if (sort === "name") {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      } else {
+        if (a.price < b.price) return -1;
+        if (a.price > b.price) return 1;
+      }
+      return 0;
+    });
+    // console.log(myData);
+    this.setState({
+      menuItemShow: myData
+    });
   };
 
   render() {
@@ -96,7 +192,6 @@ class App extends React.Component {
                 />
               </a>
             </Item>
-            {/* <div style={{ marginBottom: 50 }} /> */}
             <Menu.Item key="1">
               <Link to={"?page=food"}>
                 <Icon style={{ fontSize: 25 }} type="shopping-cart" />
@@ -111,27 +206,80 @@ class App extends React.Component {
             </Menu.Item>
             <Menu.Item
               onClick={() => {
-                this.child.showModal();
+                this.showModalAdd();
               }}
             >
-              {/* <Link to={"?page=history"}> */}
-              {/* <Icon type="fund" /> */}
               <Icon style={{ fontSize: 25 }} type="plus-circle" />
               <span>Add Item</span>
-              {/* </Link> */}
-              <AddMenu
-                // getMenuData={this.getMenuData}
-                ref={instance => {
-                  this.child = instance;
-                }}
-              />
+              <MenuAdd ref="childAdd" />
             </Menu.Item>
+            {!localStorage.token ? (
+              <Menu.Item
+                onClick={() => {
+                  this.showModalLogin();
+                }}
+              >
+                <Icon style={{ fontSize: 25 }} type="key" />
+                <span>Login</span>
+                <Login
+                  ref="childLogin"
+                  // ref={instance => {
+                  //   this.child = instance;
+                  // }}
+                />
+              </Menu.Item>
+            ) : (
+              <Menu.Item
+                onClick={() => {
+                  this.showModalLogout();
+                }}
+              >
+                <Icon style={{ fontSize: 25 }} type="poweroff" />
+                <span>Logout</span>
+                <Logout ref="childLogout" />
+              </Menu.Item>
+            )}
           </Menu>
         </Sider>
         <Layout>
           <Header style={{ background: "#002140", padding: 0, height: 60 }}>
             <Row>
-              <Col span={pages === null || pages === "food" ? 17 : 24}>
+              {/* <Button type="primary" shape="circle" icon="search" /> */}
+              {pages === null || pages === "food" ? (
+                <Col span={2}>
+                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+                  <Button
+                    onClick={this.sortAscending}
+                    // style={{ paddingLeft: "2" }}
+                    type="default"
+                    icon="arrow-up"
+                  />
+                  &nbsp;
+                  <Button
+                    onClick={this.sortDescending}
+                    type="default"
+                    icon="arrow-down"
+                  />
+                </Col>
+              ) : (
+                ""
+              )}
+              {pages === null || pages === "food" ? (
+                <Col span={2}>
+                  <Select
+                    name="sort"
+                    placeholder="Sort by"
+                    style={{ width: "100%" }}
+                    onChange={this.sortBy}
+                  >
+                    <Option value="name">Name</Option>
+                    <Option value="price">Price</Option>
+                  </Select>
+                </Col>
+              ) : (
+                ""
+              )}
+              <Col span={pages === null || pages === "food" ? 8 : 24}>
                 <Title
                   style={{
                     color: "white",
@@ -148,8 +296,28 @@ class App extends React.Component {
                 </Title>
               </Col>
               {pages === null || pages === "food" ? (
-                <Col span={1}>
-                  <Button shape="circle" icon="search" />
+                <Col span={6}>
+                  <Row>
+                    <Col span={12}>
+                      <Input
+                        style={{ width: "95%" }}
+                        placeholder="Input Keyword "
+                        onChange={this.searchMenu}
+                      />
+                    </Col>
+                    <Col span={12}>
+                      <Select
+                        name="category"
+                        placeholder="Select Category"
+                        style={{ width: "95%" }}
+                        onChange={this.filterMenubyCategory}
+                      >
+                        <Option value="all">Show All</Option>
+                        <Option value="food">Food</Option>
+                        <Option value="beverage">Beverage</Option>
+                      </Select>
+                    </Col>
+                  </Row>
                 </Col>
               ) : (
                 ""
@@ -169,6 +337,7 @@ class App extends React.Component {
               )}
             </Row>
           </Header>
+
           {/* <Content style={{ margin: "0 16px" }}> <Breadcrumb style={{ margin: "16px 0" }}> <Breadcrumb.Item> */}
           {/* {pages === null || pages === "food" ? "Food Item" : "History"} </Breadcrumb.Item> */}
           {/* <Breadcrumb.Item>Bill</Breadcrumb.Item> </Breadcrumb> */}
@@ -183,7 +352,7 @@ class App extends React.Component {
               <Food
                 loading={this.state.loading}
                 parentCallback={this.callbackFunction}
-                menuItem={this.state.menuItem}
+                menuItem={this.state.menuItemShow}
               />
             ) : pages === "history" ? (
               <History parentCallback={this.callbackFunction} />
