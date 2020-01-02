@@ -18,6 +18,7 @@ class Checkout extends React.Component {
   }
 
   showModal = () => {
+    // alert(new Date());
     this.setState({
       visible: true
     });
@@ -45,24 +46,20 @@ class Checkout extends React.Component {
     let ppn = this.props.total * 0.1;
     let total = this.props.total + ppn;
     // let created_at = new Date();
-    let created_at = this.props.date;
+    // let created_at = this.props.date;
     if (this.state.cashier === "")
       this.setState({
         handlingInput: "* Cashier Cannot Empty"
       });
     else {
-      console.log("receipt code:", codeReceipt);
-      console.log("cashier:", cashier);
-      console.log("ppn:", ppn);
-      console.log("total:", total);
-      console.log("created_at:", created_at);
-      // console.log("checkout item:", checkout);
+      // console.log("receipt code:", codeReceipt); console.log("cashier:", cashier); console.log("ppn:", ppn);
+      // console.log("total:", total); console.log("created_at:", created_at); console.log("checkout item:", checkout);
       const transactionNew = {
         transaction_code: codeReceipt,
         cashier: cashier,
         total: total,
-        ppn: ppn,
-        created_at: created_at
+        ppn: ppn
+        // created_at: created_at
       };
 
       this.setState({ loading: true });
@@ -76,8 +73,8 @@ class Checkout extends React.Component {
                   transaction_code: codeReceipt,
                   id_menu: item.id,
                   quantity: item.count,
-                  price: item.price,
-                  created_at: created_at
+                  price: item.price
+                  // created_at: created_at
                 };
                 Axios.post(
                   "http://localhost:6660/api/transaction/menu",

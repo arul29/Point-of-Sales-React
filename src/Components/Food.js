@@ -128,8 +128,13 @@ class Food extends Component {
     let total = arr.reduce((prev, next) => prev + next.count * next.price, 0);
     // console.log("ini cart", this.state.cartItem);
 
+    // let j = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // console.log(j);
+
     //KODE RECEIPT
     let date = new Date();
+    console.log("date", date);
+
     let components = [
       date.getYear(),
       date.getMonth(),
@@ -140,6 +145,8 @@ class Food extends Component {
       date.getMilliseconds()
     ];
     let codeReceiptString = components.join("");
+    // console.log("props loading", this.props.loading);
+
     return (
       <div>
         <MenuEdit ref="childEdit" />
@@ -149,7 +156,7 @@ class Food extends Component {
             span={18}
             style={{
               backgroundColor: "#e1e6e8",
-              minHeight: localStorage.token ? "135vh" : "120vh"
+              minHeight: localStorage.token ? "145vh" : "130vh"
             }}
           >
             {/* <center> */}
@@ -169,7 +176,8 @@ class Food extends Component {
                   <Skeleton active />
                 </div>
               ) : null}
-              {this.props.menuItem.length > 0 ? null : (
+              {this.props.menuItem.length === 0 &&
+              this.props.loading === false ? (
                 <center>
                   <img
                     style={{ paddingTop: "5%" }}
@@ -178,7 +186,7 @@ class Food extends Component {
                   />
                   <Title level={2}>No Result Found</Title>
                 </center>
-              )}
+              ) : null}
 
               {currentPost.map((item, index) => {
                 return (
@@ -302,7 +310,7 @@ class Food extends Component {
             span={6}
             style={{
               overflow: "auto",
-              maxHeight: localStorage.token ? "135vh" : "120vh"
+              maxHeight: localStorage.token ? "145vh" : "130vh"
             }}
           >
             {/* <div> */}
@@ -372,7 +380,8 @@ class Food extends Component {
               <div style={{ paddingTop: "40%" }}>
                 <img
                   width="100%"
-                  src="https://www.razencustoms.com/includes/img/empty-cart.png"
+                  src="https://www.infoskysolutions.com/images/cart_is_empty.png"
+                  // src="https://www.razencustoms.com/includes/img/empty-cart.png"
                 />{" "}
               </div>
             )}
