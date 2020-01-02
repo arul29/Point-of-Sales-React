@@ -41,13 +41,54 @@ class App extends React.Component {
       menuItem: [],
       menuItemShow: [],
       loading: true,
-      sortby: "name"
+      sortby: "name",
+      dataTransaction: [],
+      dataTransactionMenu: []
     };
   }
 
   componentDidMount() {
     this.getMenuData();
+    this.getHistory();
   }
+
+  getHistory() {
+    setTimeout(() => {
+      Axios.get("http://localhost:6660/api/transaction")
+        .then(res => {
+          this.setState({
+            dataTransaction: res.data.response,
+            loading: false
+          });
+          // console.log(this.state.menuItem);
+        })
+        .then(() => {
+          Axios.get("http://localhost:6660/api/transaction/menu")
+            .then(res => {
+              this.setState({
+                dataTransactionMenu: res.data.response,
+                loading: false
+              });
+              // console.log(this.state.menuItem);
+            })
+            .catch(error => {
+              console.log(error);
+              this.setState({
+                dataTransactionMenu: [],
+                loading: false
+              });
+            });
+        })
+        .catch(error => {
+          console.log(error);
+          this.setState({
+            dataTransaction: [],
+            loading: false
+          });
+        });
+    }, 500);
+  }
+
   // async
   getMenuData() {
     // di komen reduxnya dulu ya
@@ -123,7 +164,7 @@ class App extends React.Component {
     });
   }
 
-  sortAscending() {
+  sortDescending() {
     let sort = this.state.sortby;
     const myData = this.state.menuItem.sort(function(a, b) {
       if (sort === "name") {
@@ -141,7 +182,7 @@ class App extends React.Component {
     });
   }
 
-  sortDescending = () => {
+  sortAscending = () => {
     let sort = this.state.sortby;
     const myData = this.state.menuItem.sort(function(b, a) {
       if (sort === "name") {
@@ -160,6 +201,7 @@ class App extends React.Component {
   };
 
   render() {
+    // this.props.location.hash === "#!"
     // let page = this.props.location.search;
     const query = new URLSearchParams(this.props.location.search);
     let pages = query.get("page");
@@ -246,15 +288,23 @@ class App extends React.Component {
             <Row>
               {/* <Button type="primary" shape="circle" icon="search" /> */}
               {pages === null || pages === "food" ? (
-                <Col span={2}>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+                <Col span={1}>
+                  {/* &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; */}
+                  &nbsp; &nbsp;
                   <Button
                     onClick={this.sortAscending}
                     // style={{ paddingLeft: "2" }}
                     type="default"
                     icon="arrow-up"
                   />
-                  &nbsp;
+                  {/* &nbsp; */}
+                </Col>
+              ) : (
+                ""
+              )}
+
+              {pages === null || pages === "food" ? (
+                <Col span={1}>
                   <Button
                     onClick={this.sortDescending}
                     type="default"
@@ -355,7 +405,12 @@ class App extends React.Component {
                 menuItem={this.state.menuItemShow}
               />
             ) : pages === "history" ? (
-              <History parentCallback={this.callbackFunction} />
+              <History
+                loading={this.state.loading}
+                dataTransaction={this.state.dataTransaction}
+                dataTransactionMenu={this.state.dataTransactionMenu}
+                parentCallback={this.callbackFunction}
+              />
             ) : (
               <Error404 />
             )}
