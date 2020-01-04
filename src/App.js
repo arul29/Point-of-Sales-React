@@ -1,18 +1,8 @@
 import React from "react";
 // import logo from "./logo.svg";
 import "./App.css";
-import {
-  Layout,
-  Menu,
-  Breadcrumb,
-  Icon,
-  Row,
-  Col,
-  Button,
-  Badge,
-  Input,
-  Select
-} from "antd";
+import { Layout, Menu, Icon, Row, Col } from "antd";
+import { Button, Badge, Input, Select } from "antd";
 import Item from "antd/lib/list/Item";
 import { Typography } from "antd";
 import { Link } from "react-router-dom";
@@ -54,7 +44,7 @@ class App extends React.Component {
 
   getHistory() {
     setTimeout(() => {
-      Axios.get("http://localhost:6660/api/transaction")
+      Axios.get("https://mypoint-of-sales.herokuapp.com/api/transaction")
         .then(res => {
           this.setState({
             dataTransaction: res.data.response,
@@ -63,7 +53,9 @@ class App extends React.Component {
           // console.log(this.state.menuItem);
         })
         .then(() => {
-          Axios.get("http://localhost:6660/api/transaction/menu")
+          Axios.get(
+            "https://mypoint-of-sales.herokuapp.com/api/transaction/menu"
+          )
             .then(res => {
               this.setState({
                 dataTransactionMenu: res.data.response,
@@ -98,7 +90,7 @@ class App extends React.Component {
     // loading: false
     // });
     setTimeout(() => {
-      Axios.get("http://localhost:6660/api/menu")
+      Axios.get("https://mypoint-of-sales.herokuapp.com/api/menu")
         .then(res => {
           this.setState({
             menuItem: res.data.response,
