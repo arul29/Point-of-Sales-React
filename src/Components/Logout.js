@@ -1,10 +1,6 @@
 import React from "react";
-import { Modal, Button, Row, Col, Input, Upload, Icon } from "antd";
-import { Typography } from "antd";
-import { Select } from "antd";
-import Axios from "axios";
+import { Modal, Button, Row, Col, Typography } from "antd";
 import Swal from "sweetalert2";
-const { Option } = Select;
 const { Title } = Typography;
 class Logout extends React.Component {
   constructor(props) {

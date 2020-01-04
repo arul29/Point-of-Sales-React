@@ -6,12 +6,17 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
   for (let i = 1; i <= Math.ceil(totalPosts / postsPerPage); i++) {
     pageNumbers.push(i);
   }
-
   return (
     <div className="pagination" style={{ paddingLeft: 10 }}>
-      {/* <a href="#">&laquo;</a> */}
+      <a
+        href="#!"
+        disabled={currentPage === 1 ? true : false}
+        onClick={() => paginate(currentPage - 1)}
+      >
+        &laquo;
+      </a>
       {pageNumbers.map(number => (
-        <a
+        <a key={number}
           onClick={() => paginate(number)}
           href="#!"
           className={number === currentPage ? "active" : ""}
@@ -19,7 +24,15 @@ const Pagination = ({ postsPerPage, totalPosts, paginate, currentPage }) => {
           {number}
         </a>
       ))}
-      {/* <a href="#">&raquo;</a> */}
+      <a
+        href="#!"
+        disabled={
+          currentPage === Math.ceil(totalPosts / postsPerPage) ? true : false
+        }
+        onClick={() => paginate(currentPage + 1)}
+      >
+        &raquo;
+      </a>
     </div>
   );
 };

@@ -1,23 +1,12 @@
 import React, { Component } from "react";
-import {
-  Row,
-  Col,
-  Button,
-  Badge,
-  Card,
-  // Pagination,
-  InputNumber,
-  Skeleton
-} from "antd";
+import { Row, Col, Button, Card, Skeleton } from "antd";
 // import Title from "antd/lib/skeleton/Title";
 import Meta from "antd/lib/card/Meta";
 // import "./../Css/Pagination.css";
 import ButtonGroup from "antd/lib/button/button-group";
 import { Typography } from "antd";
 import Checkout from "./Checkout";
-import { getMenu } from "../Public/Redux/Actions/menu";
-import { connect } from "react-redux";
-import Axios from "axios";
+// import { getMenu } from "../Public/Redux/Actions/menu"; import { connect } from "react-redux"; import Axios from "axios";
 import Pagination from "./Pagination";
 import MenuEdit from "./MenuEdit";
 import MenuEditImg from "./MenuEditImg";
@@ -133,8 +122,7 @@ class Food extends Component {
 
     //KODE RECEIPT
     let date = new Date();
-    console.log("date", date);
-
+    // console.log("date", date);
     let components = [
       date.getYear(),
       date.getMonth(),
@@ -156,7 +144,7 @@ class Food extends Component {
             span={18}
             style={{
               backgroundColor: "#e1e6e8",
-              minHeight: localStorage.token ? "145vh" : "130vh"
+              minHeight: localStorage.token ? "140vh" : "125vh"
             }}
           >
             {/* <center> */}
@@ -190,7 +178,7 @@ class Food extends Component {
 
               {currentPost.map((item, index) => {
                 return (
-                  <Col span={8}>
+                  <Col span={8} key={index}>
                     <Card
                       hoverable
                       style={{ width: "76%", borderRadius: 10 }}
@@ -288,7 +276,8 @@ class Food extends Component {
             <center>
               <div
                 style={{
-                  position: "absolute",
+                  // position: "absolute",
+                  // position: currentPost.length < 4 ? "absolute" : "",
                   bottom: "10px",
                   margin: "auto",
                   left: 0,
@@ -310,7 +299,7 @@ class Food extends Component {
             span={6}
             style={{
               overflow: "auto",
-              maxHeight: localStorage.token ? "145vh" : "130vh"
+              maxHeight: localStorage.token ? "140vh" : "125vh"
             }}
           >
             {/* <div> */}
@@ -365,7 +354,7 @@ class Food extends Component {
                             </Button>
                           </ButtonGroup>
                           <Title level={3}>
-                            {item.price * item.count === 0
+                            {item.price * item.count < 1
                               ? this.removeCartItem(item.id)
                               : "Rp. " +
                                 this.formatNumber(item.price * item.count)}
@@ -377,7 +366,7 @@ class Food extends Component {
                 })
                 .reverse()
             ) : (
-              <div style={{ paddingTop: "40%" }}>
+              <div style={{ paddingTop: "50%" }}>
                 <img
                   width="100%"
                   src="https://www.infoskysolutions.com/images/cart_is_empty.png"
