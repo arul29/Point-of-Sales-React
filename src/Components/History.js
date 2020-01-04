@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { Row, Col, Card, Typography, Tag, Skeleton } from "antd";
+import { Row, Col, Card, Typography, Tag, Skeleton, Radio } from "antd";
 import "./../Css/History.css";
 import dateFormat from "dateformat";
-import Meta from "antd/lib/card/Meta";
 import Pagination from "./Pagination";
 import { BarChart } from "reaviz";
 const { Title } = Typography;
@@ -10,13 +9,17 @@ const { Title } = Typography;
 class History extends Component {
   constructor(props) {
     super(props);
+    this.handleChangeChart = this.handleChangeChart.bind(this);
     this.state = {
       currentPage: 1,
-      postsPerPage: 6,
+      postsPerPage: 10,
       dataTodayIncome: [],
       dataYearsIncome: [],
       dataTodayMenuSell: [],
-      chartData: []
+      dataPoints: [],
+      dataYearSale: [],
+      dataAllSale: [],
+      selectChart: "week"
     };
   }
 
@@ -26,7 +29,127 @@ class History extends Component {
     this.getTodaysIncome();
     this.getYearsIncome();
     this.getTodaysMenuSell();
-    // this.chartData();
+    this.getWeeklySales();
+    this.getYearlySales();
+    this.getAllSales();
+  }
+
+  getAllSales() {
+    let data = this.props.dataTransaction;
+    let dataAll = [];
+
+    for (var i = 0; i < data.length; i++) {
+      let Year = new Date(data[i].created_at).toString().substr(11, 4);
+      dataAll.push({
+        x: Year,
+        y: data[i].total
+      });
+    }
+    let arr = dataAll;
+    const reducedArray = arr.reduce((acc, next) => {
+      // acc stands for accumulator
+      const lastItemIndex = acc.length - 1;
+      const accHasContent = acc.length >= 1;
+
+      if (accHasContent && acc[lastItemIndex].x === next.x) {
+        acc[lastItemIndex].y += next.y;
+      } else {
+        // first time seeing this entry. add it!
+        acc[lastItemIndex + 1] = next;
+      }
+      return acc;
+    }, []);
+
+    this.setState({
+      dataAllSale: reducedArray
+    });
+  }
+  getYearlySales() {
+    let dateNow = new Date();
+    // console.log("detnow", dateNow.toString().substr(11, 4));
+
+    let data = this.props.dataTransaction;
+    let dataYear = [];
+
+    data.sort(function(a, b) {
+      if (a.created_at < b.created_at) return -1;
+      if (a.created_at > b.created_at) return 1;
+      return 0;
+    });
+
+    for (var i = 0; i < data.length; i++) {
+      if (
+        dateNow.toString().substr(11, 4) ===
+        new Date(data[i].created_at).toString().substr(11, 4)
+      ) {
+        let Month =
+          new Date(data[i].created_at).toString().substr(4, 3) +
+          " " +
+          new Date(data[i].created_at).toString().substr(11, 4);
+        dataYear.push({
+          x: Month,
+          y: data[i].total
+        });
+      }
+    }
+
+    let arr = dataYear;
+    const reducedArray = arr.reduce((acc, next) => {
+      // acc stands for accumulator
+      const lastItemIndex = acc.length - 1;
+      const accHasContent = acc.length >= 1;
+
+      if (accHasContent && acc[lastItemIndex].x === next.x) {
+        acc[lastItemIndex].y += next.y;
+      } else {
+        // first time seeing this entry. add it!
+        acc[lastItemIndex + 1] = next;
+      }
+      return acc;
+    }, []);
+    // console.log("reduce", reducedArray);
+    this.setState({
+      dataYearSale: reducedArray
+    });
+  }
+
+  getWeeklySales() {
+    let dateNow = new Date();
+    let data = this.props.dataTransaction;
+    let dataPoints = [];
+    for (var i = 0; i < data.length; i++) {
+      // console.log("data[i]", new Date(data[i].created_at).toDateString());
+      // this.dateChart(new Date(data[i].created_at)).toString().substr(0, 8)
+      // console.log("yessa",new Date(data[i].created_at).toString().substr(0, 15));
+      if (
+        dateNow.toString().substr(11, 4) ===
+        new Date(data[i].created_at).toString().substr(11, 4)
+      ) {
+        dataPoints.push({
+          x: new Date(data[i].created_at).toString().substr(0, 15),
+          y: data[i].total
+        });
+      }
+    }
+    // console.log("datapoints", dataPoints);
+    let arr = dataPoints;
+    const reducedArray = arr.reduce((acc, next) => {
+      // acc stands for accumulator
+      const lastItemIndex = acc.length - 1;
+      const accHasContent = acc.length >= 1;
+
+      if (accHasContent && acc[lastItemIndex].x === next.x) {
+        acc[lastItemIndex].y += next.y;
+      } else {
+        // first time seeing this entry. add it!
+        acc[lastItemIndex + 1] = next;
+      }
+      return acc;
+    }, []);
+    // console.log("reduce", reducedArray);
+    this.setState({
+      dataPoints: reducedArray
+    });
   }
 
   getTodaysIncome() {
@@ -46,13 +169,20 @@ class History extends Component {
 
   getYearsIncome() {
     let dateNow = new Date();
+    // console.log("ngambil year",dateFormat(dateNow).toString().substring(17, 4).split(" ")[2]);
     let filterTodayTransaction = this.props.dataTransaction;
     filterTodayTransaction = filterTodayTransaction.filter(function(item) {
       return (
         dateFormat(item.created_at)
           .toString()
-          .substring(6, 4)
-          .search(dateNow.toString().substring(6, 4)) !== -1
+          .substring(17, 4)
+          .split(" ")[2]
+          .search(
+            dateFormat(dateNow)
+              .toString()
+              .substring(17, 4)
+              .split(" ")[2]
+          ) !== -1
       );
     });
     this.setState({ dataYearsIncome: filterTodayTransaction });
@@ -70,23 +200,60 @@ class History extends Component {
           .search(dateNow.toString().substring(0, 8)) !== -1
       );
     });
-    this.setState({ dataTodayMenuSell: filterTodayTransaction });
+    // this.setState({ dataTodayMenuSell: filterTodayTransaction });
+    let data = filterTodayTransaction;
+    data.sort(function(a, b) {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
+      return 0;
+    });
+    let dataSell = [];
+    for (var i = 0; i < data.length; i++) {
+      dataSell.push({
+        x: data[i].name,
+        y: data[i].quantity
+      });
+    }
+    // console.log("datapoints", dataPoints);
+    let arr = dataSell;
+    const reducedArray = arr.reduce((acc, next) => {
+      // acc stands for accumulator
+      const lastItemIndex = acc.length - 1;
+      const accHasContent = acc.length >= 1;
+
+      if (accHasContent && acc[lastItemIndex].x === next.x) {
+        acc[lastItemIndex].y += next.y;
+      } else {
+        // first time seeing this entry. add it!
+        acc[lastItemIndex + 1] = next;
+      }
+      return acc;
+    }, []);
+    // console.log("reduce", reducedArray);
+    this.setState({
+      dataTodayMenuSell: reducedArray
+    });
   }
 
   formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   }
 
+  handleChangeChart(value) {
+    this.setState({
+      selectChart: value.target.value
+      // selectChart:value <---- for Select Option
+    });
+  }
+
   render() {
-    // console.log("chart", this.state.chartData);
     //today income
     let today = this.state.dataTodayIncome;
     let totalIncomeDay = today.reduce((prev, next) => prev + next.total, 0);
-    // console.log("TODAYS INCOME", totalIncomeDay);
     //total order
     let order = this.props.dataTransactionMenu;
     let orderTotal = order.reduce((prev, next) => prev + next.quantity, 0);
-    //today income
+    //this year income
     let year = this.state.dataYearsIncome;
     let totalIncomeYear = year.reduce((prev, next) => prev + next.total, 0);
     //pagination
@@ -97,52 +264,36 @@ class History extends Component {
       indexOflastpost
     );
 
-    let SaleToday = [];
-    this.state.dataTodayMenuSell.map(item => {
-      SaleToday.push({
-        key: item.name,
-        data: item.quantity
+    let Chart = [];
+    if (this.state.selectChart === "week") {
+      this.state.dataPoints.slice(0, 7).map(item => {
+        Chart.push({
+          key: item.x,
+          data: item.y
+        });
       });
-    });
-    console.log("Sale Today", SaleToday);
-
-    // console.log("TODAY INCOME", this.state.dataTodayMenuSell);
-
-    const categoryData = [
-      {
-        key: "2012",
-        data: 12
-      },
-      {
-        key: "IDS",
-        data: 14
-      },
-      {
-        key: "Malware",
-        data: 5
-      },
-      {
-        key: "DLP",
-        data: 18
-      }
-    ];
-
-    // let dataChart = [];
-    // this.state.dataTodayMenuSell.map(item => {
-    //   dataChart.push({
-    //     key: item.created_at,
-    //     data: item.price
-    //   });
-    //   console.log("datacart", dataChart);
-    // });
-
-    // this.setState(prevState => ({
-    //   chartData: [...prevState.chartData, newChart]
-    // }));
-
-    // this.setState( ({
-    // chartData: prevState.chartData["key"].push(item.created_at)
-    // }));
+    } else if (this.state.selectChart === "year") {
+      this.state.dataYearSale.slice(0, 7).map(item => {
+        Chart.push({
+          key: item.x,
+          data: item.y
+        });
+      });
+    } else if (this.state.selectChart === "today") {
+      this.state.dataTodayMenuSell.map(item => {
+        Chart.push({
+          key: item.x,
+          data: item.y
+        });
+      });
+    } else {
+      this.state.dataAllSale.map(item => {
+        Chart.push({
+          key: item.x,
+          data: item.y
+        });
+      });
+    }
 
     return (
       <div>
@@ -160,7 +311,7 @@ class History extends Component {
               </div>
             </Col>
           </Row>
-        ) : (
+        ) : currentPost.length > 0 ? (
           <Row
             //  gutter={16}
             style={{ paddingTop: "5%", paddingLeft: "8%" }}
@@ -175,9 +326,16 @@ class History extends Component {
                 }}
                 // cover={<img alt="example" src={} height="200" style={{}} />}
               >
-                <Meta
+                {/* <Meta
                   title="Today's Income"
-                  description={`RP. ${this.formatNumber(totalIncomeDay)}`}
+                  // description={`RP. ${this.formatNumber(totalIncomeDay)}`}
+                /> */}
+                <Title level={4}>Today's Income</Title>
+                <Title level={3}>Rp. {this.formatNumber(totalIncomeDay)}</Title>
+                <img
+                  style={{ position: "absolute", bottom: "35%", left: "70%" }}
+                  src="https://image.flaticon.com/icons/svg/1759/1759208.svg"
+                  width="50"
                 />
               </Card>
             </Col>
@@ -189,11 +347,13 @@ class History extends Component {
                   borderRadius: 10,
                   backgroundColor: "#d6e4ff"
                 }}
-                // cover={<img alt="example" src={} height="200" style={{}} />}
               >
-                <Meta
-                  title="Orders"
-                  description={`${this.formatNumber(orderTotal)} Orders`}
+                <Title level={4}>Order's</Title>
+                <Title level={3}>{this.formatNumber(orderTotal)} orders</Title>
+                <img
+                  style={{ position: "absolute", bottom: "35%", left: "70%" }}
+                  src="https://image.flaticon.com/icons/svg/1214/1214966.svg"
+                  width="50"
                 />
               </Card>
             </Col>
@@ -205,39 +365,59 @@ class History extends Component {
                   borderRadius: 10,
                   backgroundColor: "#efdbff"
                 }}
-                // cover={<img alt="example" src={} height="200" style={{}} />}
               >
-                <Meta
-                  title="This Years Income"
-                  description={`RP. ${this.formatNumber(totalIncomeYear)}`}
+                <Title level={4}>This Year's Income</Title>
+                <Title level={3}>
+                  Rp. {this.formatNumber(totalIncomeYear)}
+                </Title>
+                <img
+                  style={{ position: "absolute", bottom: "35%", left: "70%" }}
+                  src="https://image.flaticon.com/icons/svg/1584/1584863.svg"
+                  width="50"
                 />
               </Card>
             </Col>
           </Row>
+        ) : (
+          ""
         )}
-        {this.props.loading ? null : (
+        {this.props.loading ? null : currentPost.length > 0 ? (
           <Row style={{ paddingTop: "5%" }}>
             <Col span={2}></Col>
             <center>
               <Col span={20}>
+                <Radio.Group
+                  name="selectChart"
+                  onChange={this.handleChangeChart}
+                  value={this.state.selectChart}
+                >
+                  <Radio value="today">Today</Radio>
+                  <Radio value="week">Weekly</Radio>
+                  <Radio value="year">Yearly</Radio>
+                  <Radio value="all">All</Radio>
+                </Radio.Group>
+                {/* <Select value={this.state.selectChart} style={{ width: "20%" }} onChange={this.handleChangeChart} >
+                  <Option value="today">Today</Option> <Option value="week">Weekly</Option> <Option value="year">Yearly</Option> </Select> */}
+                <br />
                 <div className="container">
-                  <BarChart width={500} height={250} data={SaleToday} />
+                  <BarChart width={500} height={250} data={Chart} />
                 </div>
-                <Title level={4}>Sale's today</Title>
+                <Title level={4}>
+                  {this.state.selectChart === "week"
+                    ? "Last week's sales"
+                    : this.state.selectChart === "year"
+                    ? "This year's sales"
+                    : this.state.selectChart === "today"
+                    ? "Today's Sales"
+                    : "All Sales"}
+                </Title>
               </Col>
             </center>
             {/* <Col span={24} style={{  backgroundColor: "#e1e6e8" }} ></Col> */}
           </Row>
+        ) : (
+          ""
         )}
-        {/* <Row>
-          <Col span={24}>
-          <Table
-          style={{ padding: "2%" }}
-          dataSource={data}
-          columns={columns}
-          />
-          </Col>
-        </Row> */}
         <Row>
           <Col span={2}></Col>
           {this.props.loading ? (
@@ -272,13 +452,13 @@ class History extends Component {
                   <tbody>
                     {currentPost.map((item, index) => {
                       return (
-                        <tr>
+                        <tr key={index}>
                           <td data-column="Transaction Code">
                             {item.transaction_code}
                           </td>
                           <td data-column="Cashier">{item.cashier}</td>
                           <td data-column="Date">
-                            {dateFormat(item.created_at)}
+                            {dateFormat(item.created_at).substr(0, 21)}
                           </td>
                           <td data-column="Orders" style={{ maxWidth: 300 }}>
                             {this.props.dataTransactionMenu.map(
@@ -289,6 +469,7 @@ class History extends Component {
                                 )
                                   return (
                                     <Tag
+                                      key={index}
                                       color={
                                         data.category === "Food"
                                           ? "cyan"
@@ -348,6 +529,32 @@ class History extends Component {
 }
 
 export default History;
+
+// dateChart(date) {
+//   return (
+//     date.getFullYear().toString() +
+//     this.pad2(date.getMonth() + 1) +
+//     this.pad2(date.getDate()) +
+//     this.pad2(date.getHours()) +
+//     this.pad2(date.getMinutes()) +
+//     this.pad2(date.getSeconds())
+//   );
+// }
+
+// pad2(n) {
+//   return n < 10 ? "0" + n : n;
+// }
+
+// var output = [];
+// let array = dataYear;
+// let res = array.reduce((acc, obj) => {
+//   Object.values(obj).forEach(({ item_id, tag }) => {
+//     acc[tag] = acc[tag] || { [tag]: [] };
+//     acc[tag][tag].push(item_id);
+//   });
+//   return acc;
+// }, {});
+// console.log(Object.values(res));
 
 // chartData() {
 //   let dataChart;
@@ -448,3 +655,39 @@ export default History;
 //   }
 //   return color;
 // }
+
+// const categoryData = [
+//   {
+//     key: "2012",
+//     data: 12
+//   },
+//   {
+//     key: "IDS",
+//     data: 14
+//   },
+//   {
+//     key: "Malware",
+//     data: 5
+//   },
+//   {
+//     key: "DLP",
+//     data: 18
+//   }
+// ];
+
+// let dataChart = [];
+// this.state.dataTodayMenuSell.map(item => {
+//   dataChart.push({
+//     key: item.created_at,
+//     data: item.price
+//   });
+//   console.log("datacart", dataChart);
+// });
+
+// this.setState(prevState => ({
+//   chartData: [...prevState.chartData, newChart]
+// }));
+
+// this.setState( ({
+// chartData: prevState.chartData["key"].push(item.created_at)
+// }));
