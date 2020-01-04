@@ -1,7 +1,5 @@
 import React from "react";
-import { Modal, Button, Row, Col, Input, Upload, Icon } from "antd";
-import { Typography } from "antd";
-import { Select } from "antd";
+import { Modal, Button, Row, Col, Input, Typography, Select } from "antd";
 import Axios from "axios";
 import Swal from "sweetalert2";
 
@@ -60,7 +58,7 @@ class MenuEdit extends React.Component {
     this.setState({ loading2: true });
     setTimeout(() => {
       this.setState({ loading2: false, visible: false });
-      Axios.delete(`http://localhost:6660/api/menu/${id}`)
+      Axios.delete(`https://mypoint-of-sales.herokuapp.com/api/menu/${id}`)
         .then(() => {
           Swal.fire("Delete Success", "Menu has ben deleted", "success").then(
             () => {
@@ -91,7 +89,10 @@ class MenuEdit extends React.Component {
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.put(`http://localhost:6660/api/menu/${id}`, menuNew)
+        Axios.put(
+          `https://mypoint-of-sales.herokuapp.com/api/menu/${id}`,
+          menuNew
+        )
           .then(() => {
             Swal.fire("Edit Success", "Menu has been edited", "success").then(
               () => {
@@ -116,7 +117,7 @@ class MenuEdit extends React.Component {
       <div>
         <Modal
           visible={visible}
-          title="Add Menu"
+          title="Edit Menu"
           // onOk={this.handleOk}
           onCancel={this.handleCancel}
           footer={[

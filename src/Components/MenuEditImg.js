@@ -1,11 +1,8 @@
 import React from "react";
-import { Modal, Button, Row, Col, Input, Upload, Icon } from "antd";
-import { Typography } from "antd";
-import { Select } from "antd";
+import { Modal, Button, Row, Col, Input, Upload, Icon, Typography } from "antd";
 import Axios from "axios";
 import Swal from "sweetalert2";
 
-const { Option } = Select;
 const { Title } = Typography;
 class MenuEditImg extends React.Component {
   constructor(props) {
@@ -42,8 +39,6 @@ class MenuEditImg extends React.Component {
     });
   };
 
-  // handleCancel = () => this.setState({ previewVisible: false });
-
   handlePreview = file => {
     this.setState({
       previewImage: file.thumbUrl,
@@ -78,11 +73,13 @@ class MenuEditImg extends React.Component {
       if (this.state.fileList.length > 0)
         menuNew.append("img", this.state.fileList[0].originFileObj);
       else menuNew.append("img", this.state.img);
-      //   console.log("menu new", menuNew);
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.put(`http://localhost:6660/api/menu/img/${id}`, menuNew)
+        Axios.put(
+          `https://mypoint-of-sales.herokuapp.com/api/menu/img/${id}`,
+          menuNew
+        )
           .then(() => {
             Swal.fire(
               "Update Image Success",

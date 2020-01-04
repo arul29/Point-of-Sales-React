@@ -1,7 +1,6 @@
 import React from "react";
 import { Modal, Button, Row, Col, Input, Upload, Icon } from "antd";
-import { Typography } from "antd";
-import { Select } from "antd";
+import { Typography, Select } from "antd";
 import Axios from "axios";
 import Swal from "sweetalert2";
 
@@ -47,8 +46,6 @@ class MenuAdd extends React.Component {
       // Reset form data
     });
   };
-
-  // handleCancel = () => this.setState({ previewVisible: false });
 
   handlePreview = file => {
     this.setState({
@@ -103,7 +100,7 @@ class MenuAdd extends React.Component {
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.post("http://localhost:6660/api/menu", menuNew)
+        Axios.post("https://mypoint-of-sales.herokuapp.com/api/menu", menuNew)
           .then(() => {
             Swal.fire("Added Success", "Menu has been added", "success").then(
               () => {
