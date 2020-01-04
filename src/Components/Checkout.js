@@ -18,7 +18,6 @@ class Checkout extends React.Component {
   }
 
   showModal = () => {
-    // alert(new Date());
     this.setState({
       visible: true
     });
@@ -65,7 +64,10 @@ class Checkout extends React.Component {
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.post("http://localhost:6660/api/transaction", transactionNew)
+        Axios.post(
+          "https://mypoint-of-sales.herokuapp.com/api/transaction",
+          transactionNew
+        )
           .then(() => {
             if (checkout.length > 0) {
               return checkout.map(item => {
@@ -77,7 +79,7 @@ class Checkout extends React.Component {
                   // created_at: created_at
                 };
                 Axios.post(
-                  "http://localhost:6660/api/transaction/menu",
+                  "https://mypoint-of-sales.herokuapp.com/api/transaction/menu",
                   transactionMenu
                 );
               });
@@ -92,10 +94,13 @@ class Checkout extends React.Component {
               document.location.href = "/";
               var doc = new jsPDF();
               let space = 10;
-              doc.text(`Receipt Code ${codeReceipt}`, 10, (space += 10));
-              doc.text(`Cashier ${cashier}`, 10, (space += 10));
-              // doc.text(`Cashier ${cashier}`, 10, 30);
-              // if (checkout.length > 0) {
+              doc.text(`Receipt Code : ${codeReceipt}`, 10, (space += 10));
+              doc.text(`Cashier      : ${cashier}`, 10, (space += 10));
+              doc.text(
+                `-----------------------------------------`,
+                10,
+                (space += 10)
+              );
               checkout.map(items => {
                 // doc.text(`${items.name} ${items.count}x Rp. ${this.formatNumber(items)}`, 10, 10);
                 doc.text(
@@ -108,11 +113,17 @@ class Checkout extends React.Component {
               });
               // }
               doc.text(
+                `-----------------------------------------`,
+                10,
+                (space += 10)
+              );
+              doc.text(`PPN Rp. ${this.formatNumber(ppn)}`, 10, (space += 10));
+              doc.text(
                 `Total Rp. ${this.formatNumber(total)}`,
                 10,
                 (space += 10)
               );
-              doc.text(`Payment Cash`, 10, (space += 10));
+              doc.text(`Payment : Cash`, 10, (space += 10));
               doc.save(`${codeReceipt}.pdf`);
             });
           })
@@ -179,7 +190,7 @@ class Checkout extends React.Component {
           {checkout
             .map((item, index) => {
               return (
-                <Row>
+                <Row key={index}>
                   <Col span={16}>
                     <Title level={3}>
                       {item.name} {item.count}x
