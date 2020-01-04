@@ -259,10 +259,13 @@ class History extends Component {
     //pagination
     const indexOflastpost = this.state.currentPage * this.state.postsPerPage;
     const indexOffirstPost = indexOflastpost - this.state.postsPerPage;
-    const currentPost = this.props.dataTransaction.slice(
-      indexOffirstPost,
-      indexOflastpost
-    );
+    const currentPost = this.props.dataTransaction
+      .sort(function(b, a) {
+        if (a.created_at < b.created_at) return -1;
+        if (a.created_at > b.created_at) return 1;
+        return 0;
+      }) //sort dari data terbaru
+      .slice(indexOffirstPost, indexOflastpost);
 
     let Chart = [];
     if (this.state.selectChart === "week") {
