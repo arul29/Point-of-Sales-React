@@ -184,6 +184,12 @@ class Food extends Component {
                       style={{ width: "76%", borderRadius: 10 }}
                       cover={
                         <img
+                          onError={e => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "https://www.exchangium.com/images/notAvailable-4a01f31103311389eb5f98feb3503c6e.jpg";
+                            // "http://www.nfscars.net/static/img/not-found.png";
+                          }}
                           onClick={() =>
                             this.state.cartItem.filter(
                               cart => item.id === cart.id
