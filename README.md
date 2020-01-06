@@ -16,4 +16,4 @@
 
 ![Untitled](https://user-images.githubusercontent.com/54633249/71813991-bc9b6f00-30ad-11ea-8ca8-09d73f076a49.png)
 
-![ezgif-6-78dfc385d5c7](https://user-images.githubusercontent.com/54633249/71813997-c1602300-30ad-11ea-9156-466cbf488fc7.gif)
+![Untitled](https://user-images.githubusercontent.com/54633249/71814758-02f1cd80-30b0-11ea-9600-f85f798625f3.gif)
