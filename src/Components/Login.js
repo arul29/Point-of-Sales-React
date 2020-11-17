@@ -13,13 +13,13 @@ class Login extends React.Component {
       visible: false,
       username: "",
       password: "",
-      handlingInput: ""
+      handlingInput: "",
     };
   }
 
   showModalLogin = () => {
     this.setState({
-      visible: true
+      visible: true,
     });
   };
 
@@ -37,14 +37,14 @@ class Login extends React.Component {
       // Reset form data
       fileList: [],
       username: "",
-      password: ""
+      password: "",
       // Reset form data
     });
   };
 
   handleChangeInput(e) {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
@@ -58,16 +58,13 @@ class Login extends React.Component {
       let password = this.state.password;
       let adminLogin = {
         username,
-        password
+        password,
       };
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false });
-        Axios.post(
-          "https://mypoint-of-sales.herokuapp.com/api/admin",
-          adminLogin
-        )
-          .then(res => {
+        Axios.post("https://api-pos.darul.id/api/admin", adminLogin)
+          .then((res) => {
             this.setState({ visible: false });
             // console.log(res.data.token);
             localStorage.setItem("token", res.data.token);
@@ -76,12 +73,8 @@ class Login extends React.Component {
               document.location.href = "/";
             });
           })
-          .catch(error => {
-            Swal.fire(
-              "Login Failed",
-              "Wrong username & Password",
-              "error"
-            ).then(() => {
+          .catch((error) => {
+            Swal.fire("Login Failed", "Wrong username & Password", "error").then(() => {
               // this.props.getMenuData();
               // document.location.href = "/";
             });
@@ -106,7 +99,7 @@ class Login extends React.Component {
     //   else menuNew.append("img", this.state.img);
     //   console.log("menu new", menuNew);
 
-    //   Axios.post("http://localhost:6660/api/menu", menuNew)
+    //   Axios.post("https://api-pos.darul.id/api/menu", menuNew)
     //     .then(() => {
     //       Swal.fire("Added Success", "Menu has ben added", "success").then(
     //         () => {
@@ -135,17 +128,10 @@ class Login extends React.Component {
             <Button key="back" onClick={this.handleCancel}>
               Cancel
             </Button>,
-            <Button
-              key="submit"
-              type="primary"
-              loading={loading}
-              onClick={this.handleLogin}
-            >
+            <Button key="submit" type="primary" loading={loading} onClick={this.handleLogin}>
               Login
             </Button>,
-            <p style={{ fontSize: 13, color: "red", float: "left" }}>
-              {this.state.handlingInput}
-            </p>
+            <p style={{ fontSize: 13, color: "red", float: "left" }}>{this.state.handlingInput}</p>,
           ]}
         >
           <Row>
@@ -153,13 +139,7 @@ class Login extends React.Component {
               <Title level={3}>Username</Title>
             </Col>
             <Col span={16}>
-              <Input
-                value={this.state.username}
-                name="username"
-                onChange={this.handleChangeInput}
-                placeholder="Input Username"
-                style={{ width: "100%" }}
-              />
+              <Input value={this.state.username} name="username" onChange={this.handleChangeInput} placeholder="Input Username" style={{ width: "100%" }} />
             </Col>
           </Row>
 
@@ -168,15 +148,7 @@ class Login extends React.Component {
               <Title level={3}>Password</Title>
             </Col>
             <Col span={16}>
-              <Input
-                value={this.state.password}
-                type="password"
-                name="password"
-                min={1}
-                onChange={this.handleChangeInput}
-                placeholder="Input Price"
-                style={{ width: "100%" }}
-              />
+              <Input value={this.state.password} type="password" name="password" min={1} onChange={this.handleChangeInput} placeholder="Input Price" style={{ width: "100%" }} />
             </Col>
           </Row>
         </Modal>

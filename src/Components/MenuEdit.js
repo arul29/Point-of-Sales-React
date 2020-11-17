@@ -19,7 +19,7 @@ class MenuEdit extends React.Component {
       name: "",
       price: "",
       category: "",
-      handlingInput: ""
+      handlingInput: "",
     };
   }
 
@@ -29,7 +29,7 @@ class MenuEdit extends React.Component {
       id: id,
       name: name,
       price: price,
-      category: category
+      category: category,
     });
   };
 
@@ -37,19 +37,19 @@ class MenuEdit extends React.Component {
     this.setState({
       visible: false,
       previewVisible: false,
-      handlingInput: ""
+      handlingInput: "",
     });
   };
 
   handleChangeInput(e) {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
   handleChangeCategory(value) {
     this.setState({
-      category: value
+      category: value,
     });
   }
 
@@ -58,15 +58,13 @@ class MenuEdit extends React.Component {
     this.setState({ loading2: true });
     setTimeout(() => {
       this.setState({ loading2: false, visible: false });
-      Axios.delete(`https://mypoint-of-sales.herokuapp.com/api/menu/${id}`)
+      Axios.delete(`https://api-pos.darul.id/api/menu/${id}`)
         .then(() => {
-          Swal.fire("Delete Success", "Menu has ben deleted", "success").then(
-            () => {
-              document.location.href = "/";
-            }
-          );
+          Swal.fire("Delete Success", "Menu has ben deleted", "success").then(() => {
+            document.location.href = "/";
+          });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     }, 3000);
@@ -84,24 +82,19 @@ class MenuEdit extends React.Component {
       const menuNew = {
         name: this.state.name,
         price: this.state.price,
-        category: this.state.category
+        category: this.state.category,
       };
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.put(
-          `https://mypoint-of-sales.herokuapp.com/api/menu/${id}`,
-          menuNew
-        )
+        Axios.put(`https://api-pos.darul.id/api/menu/${id}`, menuNew)
           .then(() => {
-            Swal.fire("Edit Success", "Menu has been edited", "success").then(
-              () => {
-                // this.props.getMenuData();
-                document.location.href = "/";
-              }
-            );
+            Swal.fire("Edit Success", "Menu has been edited", "success").then(() => {
+              // this.props.getMenuData();
+              document.location.href = "/";
+            });
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
           });
       }, 3000);
@@ -124,26 +117,13 @@ class MenuEdit extends React.Component {
             <Button key="back" onClick={this.handleCancel}>
               Cancel
             </Button>,
-            <Button
-              key="submit"
-              type="primary"
-              loading={loading}
-              onClick={this.handleEditMenu}
-            >
+            <Button key="submit" type="primary" loading={loading} onClick={this.handleEditMenu}>
               Update
             </Button>,
-            <Button
-              style={{ float: "left", marginRight: "1%" }}
-              key="submit"
-              type="danger"
-              loading={loading2}
-              onClick={this.handleDeleteMenu}
-            >
+            <Button style={{ float: "left", marginRight: "1%" }} key="submit" type="danger" loading={loading2} onClick={this.handleDeleteMenu}>
               Delete
             </Button>,
-            <p style={{ fontSize: 13, color: "red", float: "left" }}>
-              {this.state.handlingInput}
-            </p>
+            <p style={{ fontSize: 13, color: "red", float: "left" }}>{this.state.handlingInput}</p>,
           ]}
         >
           <Row>
@@ -151,13 +131,7 @@ class MenuEdit extends React.Component {
               <Title level={3}>Name</Title>
             </Col>
             <Col span={16}>
-              <Input
-                value={this.state.name}
-                name="name"
-                onChange={this.handleChangeInput}
-                placeholder="Input Name"
-                style={{ width: "100%" }}
-              />
+              <Input value={this.state.name} name="name" onChange={this.handleChangeInput} placeholder="Input Name" style={{ width: "100%" }} />
             </Col>
           </Row>
 
@@ -166,15 +140,7 @@ class MenuEdit extends React.Component {
               <Title level={3}>Price</Title>
             </Col>
             <Col span={16}>
-              <Input
-                value={this.state.price}
-                type="number"
-                name="price"
-                min={1}
-                onChange={this.handleChangeInput}
-                placeholder="Input Price"
-                style={{ width: "100%" }}
-              />
+              <Input value={this.state.price} type="number" name="price" min={1} onChange={this.handleChangeInput} placeholder="Input Price" style={{ width: "100%" }} />
             </Col>
           </Row>
           <Row>

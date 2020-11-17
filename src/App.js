@@ -33,7 +33,7 @@ class App extends React.Component {
       loading: true,
       sortby: "name",
       dataTransaction: [],
-      dataTransactionMenu: []
+      dataTransactionMenu: [],
     };
   }
 
@@ -41,41 +41,39 @@ class App extends React.Component {
     this.getMenuData();
     this.getHistory();
   }
-
+  // https://mypoint-of-sales.herokuapp.com
   getHistory() {
     setTimeout(() => {
-      Axios.get("https://mypoint-of-sales.herokuapp.com/api/transaction")
-        .then(res => {
+      Axios.get("https://api-pos.darul.id/api/transaction")
+        .then((res) => {
           this.setState({
             dataTransaction: res.data.response,
-            loading: false
+            loading: false,
           });
           // console.log(this.state.menuItem);
         })
         .then(() => {
-          Axios.get(
-            "https://mypoint-of-sales.herokuapp.com/api/transaction/menu"
-          )
-            .then(res => {
+          Axios.get("https://api-pos.darul.id/api/transaction/menu")
+            .then((res) => {
               this.setState({
                 dataTransactionMenu: res.data.response,
-                loading: false
+                loading: false,
               });
               // console.log(this.state.menuItem);
             })
-            .catch(error => {
+            .catch((error) => {
               console.log(error);
               this.setState({
                 dataTransactionMenu: [],
-                loading: false
+                loading: false,
               });
             });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.setState({
             dataTransaction: [],
-            loading: false
+            loading: false,
           });
         });
     }, 500);
@@ -90,30 +88,30 @@ class App extends React.Component {
     // loading: false
     // });
     setTimeout(() => {
-      Axios.get("https://mypoint-of-sales.herokuapp.com/api/menu")
-        .then(res => {
+      Axios.get("https://api-pos.darul.id/api/menu")
+        .then((res) => {
           this.setState({
             menuItem: res.data.response,
             menuItemShow: res.data.response,
-            loading: false
+            loading: false,
           });
           // console.log(this.state.menuItem);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.setState({
             menuItem: [],
-            loading: false
+            loading: false,
           });
         });
     }, 500);
   }
 
-  callbackFunction = childData => {
+  callbackFunction = (childData) => {
     this.setState({ cartCount: childData });
   };
 
-  onCollapse = collapsed => {
+  onCollapse = (collapsed) => {
     console.log(collapsed);
     this.setState({ collapsed });
   };
@@ -131,10 +129,8 @@ class App extends React.Component {
   // var FilteredList = React.createClass({
   searchMenu(event) {
     let updatedList = this.state.menuItem;
-    updatedList = updatedList.filter(function(item) {
-      return (
-        item.name.toLowerCase().search(event.target.value.toLowerCase()) !== -1
-      );
+    updatedList = updatedList.filter(function (item) {
+      return item.name.toLowerCase().search(event.target.value.toLowerCase()) !== -1;
     });
     this.setState({ menuItemShow: updatedList });
   }
@@ -143,7 +139,7 @@ class App extends React.Component {
       this.setState({ menuItemShow: this.state.menuItem });
     } else {
       let updatedList = this.state.menuItem;
-      updatedList = updatedList.filter(function(item) {
+      updatedList = updatedList.filter(function (item) {
         return item.category.toLowerCase().search(value.toLowerCase()) !== -1;
       });
       this.setState({ menuItemShow: updatedList });
@@ -152,13 +148,13 @@ class App extends React.Component {
 
   sortBy(value) {
     this.setState({
-      sortby: value
+      sortby: value,
     });
   }
 
   sortDescending() {
     let sort = this.state.sortby;
-    const myData = this.state.menuItem.sort(function(a, b) {
+    const myData = this.state.menuItem.sort(function (a, b) {
       if (sort === "name") {
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
@@ -170,13 +166,13 @@ class App extends React.Component {
     });
     // console.log(myData);
     this.setState({
-      menuItemShow: myData
+      menuItemShow: myData,
     });
   }
 
   sortAscending = () => {
     let sort = this.state.sortby;
-    const myData = this.state.menuItem.sort(function(b, a) {
+    const myData = this.state.menuItem.sort(function (b, a) {
       if (sort === "name") {
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
@@ -188,7 +184,7 @@ class App extends React.Component {
     });
     // console.log(myData);
     this.setState({
-      menuItemShow: myData
+      menuItemShow: myData,
     });
   };
 
@@ -200,30 +196,17 @@ class App extends React.Component {
     // console.log(pages);
     return (
       <Layout style={{ minHeight: "100vh" }}>
-        <Sider
-          collapsible
-          collapsed={this.state.collapsed}
-          onCollapse={this.onCollapse}
-        >
+        <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
           <div className="logo" />
           <Menu
             theme="dark"
             // defaultSelectedKeys={["1"]}
-            selectedKeys={[
-              pages === null || pages === "food"
-                ? "1"
-                : pages === "history"
-                ? "2"
-                : ""
-            ]}
+            selectedKeys={[pages === null || pages === "food" ? "1" : pages === "history" ? "2" : ""]}
             mode="inline"
           >
             <Item style={{ marginLeft: "35%" }}>
               <a href="/">
-                <img
-                  width="32"
-                  src="https://image.flaticon.com/icons/png/512/138/138310.png"
-                />
+                <img width="32" src="https://image.flaticon.com/icons/png/512/138/138310.png" />
               </a>
             </Item>
             <Menu.Item key="1">
@@ -297,23 +280,14 @@ class App extends React.Component {
 
               {pages === null || pages === "food" ? (
                 <Col span={1}>
-                  <Button
-                    onClick={this.sortDescending}
-                    type="default"
-                    icon="arrow-down"
-                  />
+                  <Button onClick={this.sortDescending} type="default" icon="arrow-down" />
                 </Col>
               ) : (
                 ""
               )}
               {pages === null || pages === "food" ? (
                 <Col span={2}>
-                  <Select
-                    name="sort"
-                    placeholder="Sort by"
-                    style={{ width: "100%" }}
-                    onChange={this.sortBy}
-                  >
+                  <Select name="sort" placeholder="Sort by" style={{ width: "100%" }} onChange={this.sortBy}>
                     <Option value="name">Name</Option>
                     <Option value="price">Price</Option>
                   </Select>
@@ -326,34 +300,21 @@ class App extends React.Component {
                   style={{
                     color: "white",
                     paddingLeft: "50%",
-                    paddingTop: 15
+                    paddingTop: 15,
                   }}
                   level={4}
                 >
-                  {pages === null || pages === "food"
-                    ? "Food Item"
-                    : pages === "history"
-                    ? "History"
-                    : "Not Found"}
+                  {pages === null || pages === "food" ? "Food Item" : pages === "history" ? "History" : "Not Found"}
                 </Title>
               </Col>
               {pages === null || pages === "food" ? (
                 <Col span={6}>
                   <Row>
                     <Col span={12}>
-                      <Input
-                        style={{ width: "95%" }}
-                        placeholder="Input Keyword "
-                        onChange={this.searchMenu}
-                      />
+                      <Input style={{ width: "95%" }} placeholder="Input Keyword " onChange={this.searchMenu} />
                     </Col>
                     <Col span={12}>
-                      <Select
-                        name="category"
-                        placeholder="Select Category"
-                        style={{ width: "95%" }}
-                        onChange={this.filterMenubyCategory}
-                      >
+                      <Select name="category" placeholder="Select Category" style={{ width: "95%" }} onChange={this.filterMenubyCategory}>
                         <Option value="all">Show All</Option>
                         <Option value="food">Food</Option>
                         <Option value="beverage">Beverage</Option>
@@ -387,30 +348,19 @@ class App extends React.Component {
             style={{
               //padding: 24,
               background: "#fff",
-              minHeight: 500
+              minHeight: 500,
             }}
           >
             {pages === null || pages === "food" ? (
-              <Food
-                loading={this.state.loading}
-                parentCallback={this.callbackFunction}
-                menuItem={this.state.menuItemShow}
-              />
+              <Food loading={this.state.loading} parentCallback={this.callbackFunction} menuItem={this.state.menuItemShow} />
             ) : pages === "history" ? (
-              <History
-                loading={this.state.loading}
-                dataTransaction={this.state.dataTransaction}
-                dataTransactionMenu={this.state.dataTransactionMenu}
-                parentCallback={this.callbackFunction}
-              />
+              <History loading={this.state.loading} dataTransaction={this.state.dataTransaction} dataTransactionMenu={this.state.dataTransactionMenu} parentCallback={this.callbackFunction} />
             ) : (
               <Error404 />
             )}
           </div>
           {/* </Content> */}
-          <Footer style={{ textAlign: "center" }}>
-            Food & Beverage ©2020 Created by Andi Mashdarul Khair
-          </Footer>
+          <Footer style={{ textAlign: "center" }}>Food & Beverage ©2020 Created by Andi Mashdarul Khair</Footer>
         </Layout>
       </Layout>
     );
