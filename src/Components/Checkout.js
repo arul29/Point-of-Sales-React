@@ -13,13 +13,13 @@ class Checkout extends React.Component {
     this.state = {
       loading: false,
       visible: false,
-      cashier: ""
+      cashier: "",
     };
   }
 
   showModal = () => {
     this.setState({
-      visible: true
+      visible: true,
     });
   };
 
@@ -48,7 +48,7 @@ class Checkout extends React.Component {
     // let created_at = this.props.date;
     if (this.state.cashier === "")
       this.setState({
-        handlingInput: "* Cashier Cannot Empty"
+        handlingInput: "* Cashier Cannot Empty",
       });
     else {
       // console.log("receipt code:", codeReceipt); console.log("cashier:", cashier); console.log("ppn:", ppn);
@@ -57,77 +57,49 @@ class Checkout extends React.Component {
         transaction_code: codeReceipt,
         cashier: cashier,
         total: total,
-        ppn: ppn
+        ppn: ppn,
         // created_at: created_at
       };
 
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.post(
-          "https://mypoint-of-sales.herokuapp.com/api/transaction",
-          transactionNew
-        )
+        Axios.post("https://api-pos.darul.id/api/transaction", transactionNew)
           .then(() => {
             if (checkout.length > 0) {
-              return checkout.map(item => {
+              return checkout.map((item) => {
                 let transactionMenu = {
                   transaction_code: codeReceipt,
                   id_menu: item.id,
                   quantity: item.count,
-                  price: item.price
+                  price: item.price,
                   // created_at: created_at
                 };
-                Axios.post(
-                  "https://mypoint-of-sales.herokuapp.com/api/transaction/menu",
-                  transactionMenu
-                );
+                Axios.post("https://api-pos.darul.id/api/transaction/menu", transactionMenu);
               });
             }
           })
           .then(() => {
-            Swal.fire(
-              "Checkout Success",
-              "Transaction has been finished",
-              "success"
-            ).then(() => {
+            Swal.fire("Checkout Success", "Transaction has been finished", "success").then(() => {
               document.location.href = "/";
               var doc = new jsPDF();
               let space = 10;
               doc.text(`Receipt Code : ${codeReceipt}`, 10, (space += 10));
               doc.text(`Cashier      : ${cashier}`, 10, (space += 10));
-              doc.text(
-                `-----------------------------------------`,
-                10,
-                (space += 10)
-              );
-              checkout.map(items => {
+              doc.text(`-----------------------------------------`, 10, (space += 10));
+              checkout.map((items) => {
                 // doc.text(`${items.name} ${items.count}x Rp. ${this.formatNumber(items)}`, 10, 10);
-                doc.text(
-                  `${items.name} ${items.count}x Rp. ${this.formatNumber(
-                    items.price
-                  )}`,
-                  10,
-                  (space += 10)
-                );
+                doc.text(`${items.name} ${items.count}x Rp. ${this.formatNumber(items.price)}`, 10, (space += 10));
               });
               // }
-              doc.text(
-                `-----------------------------------------`,
-                10,
-                (space += 10)
-              );
+              doc.text(`-----------------------------------------`, 10, (space += 10));
               doc.text(`PPN Rp. ${this.formatNumber(ppn)}`, 10, (space += 10));
-              doc.text(
-                `Total Rp. ${this.formatNumber(total)}`,
-                10,
-                (space += 10)
-              );
+              doc.text(`Total Rp. ${this.formatNumber(total)}`, 10, (space += 10));
               doc.text(`Payment : Cash`, 10, (space += 10));
               doc.save(`${codeReceipt}.pdf`);
             });
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
           });
       }, 3000);
@@ -136,7 +108,7 @@ class Checkout extends React.Component {
 
   handleChangeCashier(e) {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
@@ -164,28 +136,15 @@ class Checkout extends React.Component {
             <Button key="back" onClick={this.handleCancel}>
               Cancel
             </Button>,
-            <Button
-              key="submit"
-              type="primary"
-              loading={loading}
-              onClick={this.handleCheckout}
-            >
+            <Button key="submit" type="primary" loading={loading} onClick={this.handleCheckout}>
               Print
             </Button>,
-            <p style={{ fontSize: 13, color: "red", float: "left" }}>
-              {this.state.handlingInput}
-            </p>
+            <p style={{ fontSize: 13, color: "red", float: "left" }}>{this.state.handlingInput}</p>,
           ]}
         >
           <center>
             <Title level={4}>Receipt code. {codeReceiptString} </Title>
-            <Input
-              value={this.state.cashier}
-              name="cashier"
-              onChange={this.handleChangeCashier}
-              placeholder="Chasier"
-              style={{ width: "62%" }}
-            />
+            <Input value={this.state.cashier} name="cashier" onChange={this.handleChangeCashier} placeholder="Chasier" style={{ width: "62%" }} />
           </center>
           {checkout
             .map((item, index) => {
@@ -197,9 +156,7 @@ class Checkout extends React.Component {
                     </Title>
                   </Col>
                   <Col span={8}>
-                    <Title level={3}>
-                      Rp. {this.formatNumber(item.price * item.count)}
-                    </Title>
+                    <Title level={3}>Rp. {this.formatNumber(item.price * item.count)}</Title>
                   </Col>
                 </Row>
                 // <Title level={4}>Receipt code. {codeReceiptString} </Title>

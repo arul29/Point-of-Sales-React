@@ -22,13 +22,13 @@ class MenuAdd extends React.Component {
       price: "",
       category: "",
       img: "",
-      handlingInput: ""
+      handlingInput: "",
     };
   }
 
   showModalAdd = () => {
     this.setState({
-      visible: true
+      visible: true,
     });
   };
 
@@ -42,15 +42,15 @@ class MenuAdd extends React.Component {
       name: "",
       price: "",
       category: "",
-      img: ""
+      img: "",
       // Reset form data
     });
   };
 
-  handlePreview = file => {
+  handlePreview = (file) => {
     this.setState({
       previewImage: file.thumbUrl,
-      previewVisible: true
+      previewVisible: true,
     });
   };
 
@@ -68,13 +68,13 @@ class MenuAdd extends React.Component {
 
   handleChangeInput(e) {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
   handleChangeCategory(value) {
     this.setState({
-      category: value
+      category: value,
     });
   }
 
@@ -92,24 +92,21 @@ class MenuAdd extends React.Component {
       menuNew.append("name", this.state.name);
       menuNew.append("price", this.state.price);
       menuNew.append("category", this.state.category);
-      if (this.state.fileList.length > 0)
-        menuNew.append("img", this.state.fileList[0].originFileObj);
+      if (this.state.fileList.length > 0) menuNew.append("img", this.state.fileList[0].originFileObj);
       else menuNew.append("img", this.state.img);
       console.log("menu new", menuNew);
 
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.post("https://mypoint-of-sales.herokuapp.com/api/menu", menuNew)
+        Axios.post("https://api-pos.darul.id/api/menu", menuNew)
           .then(() => {
-            Swal.fire("Added Success", "Menu has been added", "success").then(
-              () => {
-                // this.props.getMenuData();
-                document.location.href = "/";
-              }
-            );
+            Swal.fire("Added Success", "Menu has been added", "success").then(() => {
+              // this.props.getMenuData();
+              document.location.href = "/";
+            });
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
           });
       }, 3000);
@@ -140,17 +137,10 @@ class MenuAdd extends React.Component {
             <Button key="back" onClick={this.handleCancel}>
               Cancel
             </Button>,
-            <Button
-              key="submit"
-              type="primary"
-              loading={loading}
-              onClick={this.handleInputMenu}
-            >
+            <Button key="submit" type="primary" loading={loading} onClick={this.handleInputMenu}>
               Add
             </Button>,
-            <p style={{ fontSize: 13, color: "red", float: "left" }}>
-              {this.state.handlingInput}
-            </p>
+            <p style={{ fontSize: 13, color: "red", float: "left" }}>{this.state.handlingInput}</p>,
           ]}
         >
           <Row>
@@ -158,13 +148,7 @@ class MenuAdd extends React.Component {
               <Title level={3}>Name</Title>
             </Col>
             <Col span={16}>
-              <Input
-                value={this.state.name}
-                name="name"
-                onChange={this.handleChangeInput}
-                placeholder="Input Name"
-                style={{ width: "100%" }}
-              />
+              <Input value={this.state.name} name="name" onChange={this.handleChangeInput} placeholder="Input Name" style={{ width: "100%" }} />
             </Col>
           </Row>
 
@@ -173,15 +157,7 @@ class MenuAdd extends React.Component {
               <Title level={3}>Price</Title>
             </Col>
             <Col span={16}>
-              <Input
-                value={this.state.price}
-                type="number"
-                name="price"
-                min={1}
-                onChange={this.handleChangeInput}
-                placeholder="Input Price"
-                style={{ width: "100%" }}
-              />
+              <Input value={this.state.price} type="number" name="price" min={1} onChange={this.handleChangeInput} placeholder="Input Price" style={{ width: "100%" }} />
             </Col>
           </Row>
           <Row>

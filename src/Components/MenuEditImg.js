@@ -15,7 +15,7 @@ class MenuEditImg extends React.Component {
       previewVisible: false,
       previewImage: "",
       fileList: [],
-      handlingInput: ""
+      handlingInput: "",
     };
   }
 
@@ -24,7 +24,7 @@ class MenuEditImg extends React.Component {
       visible: true,
       id: id,
       img: "",
-      imgPreview: img
+      imgPreview: img,
     });
   };
 
@@ -34,15 +34,15 @@ class MenuEditImg extends React.Component {
       previewVisible: false,
       handlingInput: "",
       // Reset form data
-      fileList: []
+      fileList: [],
       // Reset form data
     });
   };
 
-  handlePreview = file => {
+  handlePreview = (file) => {
     this.setState({
       previewImage: file.thumbUrl,
-      previewVisible: true
+      previewVisible: true,
     });
   };
 
@@ -60,7 +60,7 @@ class MenuEditImg extends React.Component {
 
   handleChangeInput(e) {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
@@ -70,26 +70,18 @@ class MenuEditImg extends React.Component {
       this.setState({ handlingInput: "* Image Cannot Empty" });
     } else {
       const menuNew = new FormData();
-      if (this.state.fileList.length > 0)
-        menuNew.append("img", this.state.fileList[0].originFileObj);
+      if (this.state.fileList.length > 0) menuNew.append("img", this.state.fileList[0].originFileObj);
       else menuNew.append("img", this.state.img);
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.put(
-          `https://mypoint-of-sales.herokuapp.com/api/menu/img/${id}`,
-          menuNew
-        )
+        Axios.put(`https://api-pos.darul.id/api/menu/img/${id}`, menuNew)
           .then(() => {
-            Swal.fire(
-              "Update Image Success",
-              " Image Menu has been edited",
-              "success"
-            ).then(() => {
+            Swal.fire("Update Image Success", " Image Menu has been edited", "success").then(() => {
               document.location.href = "/";
             });
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
           });
       }, 3000);
@@ -120,27 +112,16 @@ class MenuEditImg extends React.Component {
             <Button key="back" onClick={this.handleCancel}>
               Cancel
             </Button>,
-            <Button
-              key="submit"
-              type="primary"
-              loading={loading}
-              onClick={this.handleEditMenuImg}
-            >
+            <Button key="submit" type="primary" loading={loading} onClick={this.handleEditMenuImg}>
               Update
             </Button>,
-            <p style={{ fontSize: 13, color: "red", float: "left" }}>
-              {this.state.handlingInput}
-            </p>
+            <p style={{ fontSize: 13, color: "red", float: "left" }}>{this.state.handlingInput}</p>,
           ]}
         >
           <Row>
             <Col>
               <center>
-                <img
-                  style={{ padding: "2%", borderRadius: 20 }}
-                  width="50%"
-                  src={this.state.imgPreview}
-                />
+                <img style={{ padding: "2%", borderRadius: 20 }} width="50%" src={this.state.imgPreview} />
               </center>
             </Col>
           </Row>

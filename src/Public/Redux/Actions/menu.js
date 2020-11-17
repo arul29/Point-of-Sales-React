@@ -3,7 +3,7 @@ import Axios from "axios";
 export const getMenu = () => {
   return {
     type: "GET_MENU",
-    payload: Axios.get("http://localhost:6660/api/menu")
+    payload: Axios.get("http://localhost:6660/api/menu"),
   };
 };
 
