@@ -75,7 +75,7 @@ class MenuEditImg extends React.Component {
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.put(`https://api-pos.darul.id/api/menu/img/${id}`, menuNew)
+        Axios.put(`https://api-pos.darul.id/api/menu/img/?id=${id}`, menuNew)
           .then(() => {
             Swal.fire("Update Image Success", " Image Menu has been edited", "success").then(() => {
               document.location.href = "/";

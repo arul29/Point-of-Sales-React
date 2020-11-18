@@ -58,7 +58,7 @@ class MenuEdit extends React.Component {
     this.setState({ loading2: true });
     setTimeout(() => {
       this.setState({ loading2: false, visible: false });
-      Axios.delete(`https://api-pos.darul.id/api/menu/${id}`)
+      Axios.delete(`https://api-pos.darul.id/api/menu/?id=${id}`)
         .then(() => {
           Swal.fire("Delete Success", "Menu has ben deleted", "success").then(() => {
             document.location.href = "/";
@@ -87,7 +87,7 @@ class MenuEdit extends React.Component {
       this.setState({ loading: true });
       setTimeout(() => {
         this.setState({ loading: false, visible: false });
-        Axios.put(`https://api-pos.darul.id/api/menu/${id}`, menuNew)
+        Axios.put(`https://api-pos.darul.id/api/menu/?id=${id}`, menuNew)
           .then(() => {
             Swal.fire("Edit Success", "Menu has been edited", "success").then(() => {
               // this.props.getMenuData();
